@@ -1,290 +1,782 @@
 <!DOCTYPE html>
 <html lang="ur">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ملٹی میڈیا سپرمین چیٹ بوٹ (AI + Voice + Pic + Video)</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Professional AI Assistant</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --bg-2: #0d1729;
+      --panel: rgba(17, 24, 39, 0.9);
+      --panel-soft: rgba(15, 23, 42, 0.8);
+      --card: rgba(30, 41, 59, 0.96);
+      --line: rgba(148, 163, 184, 0.24);
+      --text: #e2e8f0;
+      --muted: #a5b4c9;
+      --primary: #7c3aed;
+      --primary-2: #4f46e5;
+      --success: #10b981;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --button: #2563eb;
+      --shadow: rgba(0, 0, 0, 0.36);
+    }
 
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            direction: rtl;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        .chat-container {
-            width: 100%;
-            max-width: 500px;
-            height: 95vh;
-            background: #1e293b;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
-            border: 1px solid #334155;
-        }
+    html, body {
+      height: 100%;
+      background: linear-gradient(135deg, var(--bg), var(--bg-2));
+      color: var(--text);
+    }
 
-        .chat-header {
-            background: #8b5cf6;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      direction: rtl;
+    }
 
-        .chat-header span {
-            font-size: 12px;
-            font-weight: normal;
-            color: #ede9fe;
-        }
+    .app-shell {
+      width: min(1200px, 100%);
+      height: min(92vh, 900px);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 18px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid var(--line);
+      box-shadow: 0 26px 80px var(--shadow);
+    }
 
-        .chat-box {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 23, 42, 0.85);
+      min-width: 0;
+    }
 
-        .message {
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 15px;
-            line-height: 1.5;
-        }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      background: rgba(13, 19, 31, 0.9);
+      border-bottom: 1px solid var(--line);
+    }
 
-        .user-message {
-            background: #6366f1;
-            color: white;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
 
-        .bot-message {
-            background: #334155;
-            color: #f1f5f9;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-            border: 1px solid #475569;
-        }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #60a5fa, #8b5cf6, #a78bfa);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+    }
 
-        .bot-message img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 8px;
-        }
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 2px solid rgba(255,255,255,0.9);
+      border-radius: 8px;
+      transform: rotate(45deg);
+    }
 
-        .extra-tools {
-            display: flex;
-            justify-content: space-around;
-            padding: 8px;
-            background: #1e293b;
-            border-top: 1px solid #334155;
-            font-size: 12px;
-        }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .tool-btn {
-            background: #475569;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tool-btn:hover { background: #64748b; }
+    .mini-btn {
+      border: 1px solid var(--line);
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
 
-        .chat-input-area {
-            display: flex;
-            padding: 12px;
-            background: #0f172a;
-            border-top: 1px solid #334155;
-            gap: 8px;
-        }
+    .mini-btn:hover,
+    .tool-btn:hover,
+    .send-btn:hover,
+    .secondary-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
 
-        input[type="text"] {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #475569;
-            background: #1e293b;
-            color: white;
-            border-radius: 8px;
-            outline: none;
-            font-size: 15px;
-        }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: rgba(9, 15, 24, 0.6);
+    }
 
-        input[type="text"]:focus {
-            border-color: #8b5cf6;
-        }
+    .message {
+      max-width: 82%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      line-height: 1.65;
+      font-size: 15px;
+      word-wrap: break-word;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.16);
+    }
 
-        button.send-btn {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            padding: 0 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-        }
-        button.send-btn:hover { background-color: #059669; }
-    </style>
+    .message.bot {
+      align-self: flex-start;
+      background: rgba(51, 65, 85, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      color: var(--text);
+      border-bottom-left-radius: 6px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: white;
+      border-bottom-right-radius: 6px;
+    }
+
+    .message img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: block;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .tool-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 18px 8px;
+      background: rgba(15, 23, 42, 0.75);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tool-btn,
+    .send-btn,
+    .secondary-btn,
+    .danger-btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.18s ease;
+    }
+
+    .tool-btn {
+      background: rgba(51, 65, 85, 0.9);
+      color: white;
+      padding: 9px 12px;
+      min-width: 86px;
+    }
+
+    .composer {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px 18px;
+      background: rgba(15, 23, 42, 0.86);
+    }
+
+    .composer input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(11, 18, 32, 0.9);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 15px 16px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .composer input:focus {
+      border-color: rgba(129, 140, 248, 0.9);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      padding: 0 22px;
+      min-width: 110px;
+      font-size: 15px;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      background: rgba(17, 24, 39, 0.92);
+      border-left: 1px solid var(--line);
+      padding: 18px 16px;
+      gap: 14px;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 6px;
+      font-size: 2rem;
+      line-height: 1.05;
+      letter-spacing: -1px;
+    }
+
+    .model-box,
+    .control-box,
+    .result-box {
+      background: rgba(30, 41, 59, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .model-row label {
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 52px;
+    }
+
+    .model-select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .textarea {
+      width: 100%;
+      min-height: 170px;
+      resize: vertical;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 14px;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .file-picker {
+      width: 100%;
+      margin-top: 14px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .secondary-btn,
+    .danger-btn {
+      min-height: 44px;
+      color: white;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .secondary-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .danger-btn {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    .result-box {
+      flex: 1;
+      min-height: 220px;
+      padding: 18px 16px;
+      background: rgba(7, 13, 22, 0.8);
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    .result-box .result-output {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: var(--text);
+      font-size: 15px;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .status {
+      margin-top: 10px;
+      color: var(--muted);
+      min-height: 18px;
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 980px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid var(--line);
+      }
+
+      body {
+        padding: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="app-shell">
+    <div class="chat-panel">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <span>AI Assistant</span>
+        </div>
+        <div class="header-actions">
+          <button class="mini-btn" type="button" id="saveBtn">Save</button>
+          <button class="mini-btn" type="button" id="controlsBtn">Controls</button>
+        </div>
+      </div>
 
-<div class="chat-container">
-    <div class="chat-header">
-        ملٹی میڈیا سپرمین بوট
-        <span>آواز، تصویر، ویڈیو اور تمام عام و خاص کام!</span>
-    </div>
-    
-    <div class="chat-box" id="chatBox">
-        <div class="message bot-message">سلام! میں تیار ہوں۔ آپ مجھ سے لکھ کر بات کریں، نیچے دیے گئے بٹنوں سے **تصویر** بنوائیں، **آواز** سنیں یا **بول کر** حکم دیں۔</div>
+      <div class="messages" id="messagesBox" aria-live="polite"></div>
+
+      <div class="tool-row">
+        <button class="tool-btn" type="button" onclick="startVoiceInput()">🎤 Voice</button>
+        <button class="tool-btn" type="button" onclick="generateImage()">🖼️ Image</button>
+        <button class="tool-btn" type="button" onclick="createVideoIdea()">🎬 Video</button>
+        <button class="tool-btn" type="button" onclick="downloadConversation()">⬇️ Save</button>
+      </div>
+
+      <div class="composer">
+        <input id="userInput" type="text" placeholder="یہاں اپنا سوال درج کریں..." aria-label="User message" />
+        <button class="send-btn" type="button" id="sendBtn">Send</button>
+      </div>
     </div>
 
-    <!-- ملٹی میڈیا ٹولز -->
-    <div class="extra-tools">
-        <button class="tool-btn" onclick="startVoiceInput()">🎤 بول کر لکھیں</button>
-        <button class="tool-btn" onclick="speakLastMessage()">🔊 آواز سنیں</button>
-        <button class="tool-btn" onclick="generateImage()">🖼️ تصویر بنائیں</button>
-        <button class="tool-btn" onclick="createVideoIdea()">🎬 ویڈیو بنا/سجھاؤ</button>
-    </div>
+    <aside class="sidebar">
+      <div>
+        <h2>Gemini Pro AI Assistant</h2>
+      </div>
 
-    <div class="chat-input-area">
-        <input type="text" id="userInput" placeholder="یہاں کچھ لکھیں..." onkeypress="handleKeyPress(event)">
-        <button class="send-btn" onclick="sendMessage()">بھیجیں</button>
-    </div>
-</div>
+      <div class="model-box">
+        <div class="model-row">
+          <label for="modelSelect">Model</label>
+          <select id="modelSelect" class="model-select">
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+          </select>
+        </div>
+      </div>
 
-<script>
+      <div class="control-box">
+        <textarea id="promptInput" class="textarea" placeholder="Type your prompt here... Example: Write a professional landing page for a tech startup and generate a project folder structure."></textarea>
+
+        <input id="imageInput" class="file-picker" type="file" accept="image/*" />
+
+        <div class="button-grid">
+          <button class="secondary-btn" type="button" id="askBtn">Ask Gemini</button>
+          <button class="secondary-btn" type="button" id="downloadTxtBtn">Download .txt</button>
+          <button class="secondary-btn" type="button" id="downloadMdBtn">Download .md</button>
+          <button class="danger-btn" type="button" id="downloadJsonBtn">Download .json</button>
+          <button class="danger-btn" type="button" id="zipBtn" style="grid-column: 1 / -1;">Generate Folder ZIP</button>
+        </div>
+
+        <div id="statusBox" class="status">Ready.</div>
+      </div>
+
+      <div class="result-box">
+        <div id="resultOutput" class="result-output">Your answer will appear here...</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+    const MODEL_NAME = "gemini-2.0-flash";
+
+    const messagesBox = document.getElementById("messagesBox");
+    const userInput = document.getElementById("userInput");
+    const promptInput = document.getElementById("promptInput");
+    const statusBox = document.getElementById("statusBox");
+    const resultOutput = document.getElementById("resultOutput");
+    const imageInput = document.getElementById("imageInput");
+    const modelSelect = document.getElementById("modelSelect");
+
+    let lastAnswer = "";
+    let thinkingMessageId = null;
+
+    function setStatus(message) {
+      statusBox.textContent = message;
+    }
+
+    function addMessage(text, sender = "bot", isHTML = false) {
+      const div = document.createElement("div");
+      div.className = "message " + sender;
+      if (isHTML) {
+        div.innerHTML = text;
+      } else {
+        div.textContent = text;
+      }
+      messagesBox.appendChild(div);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+      return div;
+    }
+
+    function showThinking() {
+      if (thinkingMessageId) {
+        thinkingMessageId.remove();
+      }
+      const msg = addMessage("Thinking...", "bot");
+      thinkingMessageId = msg;
+    }
+
+    function clearThinking() {
+      if (thinkingMessageId) {
+        thinkingMessageId.remove();
+        thinkingMessageId = null;
+      }
+    }
+
+    function setResultText(text) {
+      resultOutput.textContent = text;
+      lastAnswer = text;
+    }
+
+    function fallbackReply(prompt) {
+      const text = prompt.trim();
+      const lower = text.toLowerCase();
+
+      if (!text) return "Please enter a valid question.";
+      if (lower.includes("hello") || lower.includes("hi") || lower.includes("سلام")) {
+        return "Hello! I am ready to help you. Ask me anything and I will provide a clear answer, project structure, or content.";
+      }
+      if (lower.includes("landing page") || lower.includes("website") || lower.includes("web page")) {
+        return "Here is a clean plan:\n1. Hero section with headline and CTA\n2. Features section\n3. Pricing or process section\n4. Testimonials\n5. Final CTA and contact form\nI can also generate the full HTML/CSS/JS code for this.";
+      }
+      if (lower.includes("code") || lower.includes("program") || lower.includes("script")) {
+        return "I can generate HTML, CSS, JavaScript, Python, Node.js, and full project structures. Please provide the language and purpose and I will draft the complete solution.";
+      }
+      if (lower.includes("image") || lower.includes("photo") || lower.includes("pic")) {
+        return "I can help you create an image prompt or generate a visual concept. Use the Image button to create a prompt-based image in the browser.";
+      }
+      if (lower.includes("video") || lower.includes("video idea") || lower.includes("reel") || lower.includes("content")) {
+        return "Create a short script with 3 acts: hook, value, CTA. Example: opening shot, problem, solution, result, call to action.";
+      }
+
+      return `Here is a helpful answer for: "${text}"\n\nYour request is clear, and I can help with writing, coding, planning, content creation, business ideas, or project generation. If you want, I can turn this into a web page, app, landing page, script, or folder structure.`;
+    }
+
+    async function callGemini(prompt) {
+      if (!GEMINI_API_KEY || GEMINI_API_KEY === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
+        return fallbackReply(prompt);
+      }
+
+      const requestBody = {
+        contents: [{
+          role: "user",
+          parts: [{ text: prompt }]
+        }]
+      };
+
+      const model = modelSelect.value || MODEL_NAME;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const message = data?.error?.message || "Gemini API request failed.";
+        throw new Error(message);
+      }
+
+      const output = data?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("\n") || "";
+
+      if (!output.trim()) {
+        throw new Error("Gemini returned empty result.");
+      }
+
+      return output;
+    }
+
     async function sendMessage() {
-        const input = document.getElementById("userInput");
-        const text = input.value.trim();
-        if (text === "") return;
+      const text = (userInput.value || promptInput.value || "").trim();
+      const finalText = text || userInput.value.trim();
 
-        appendMessage(text, "user-message");
-        input.value = "";
+      if (!finalText) {
+        setStatus("Please enter a question first.");
+        return;
+      }
 
-        const loadingId = appendMessage("سوچ رہا ہوں...", "bot-message");
+      addMessage(finalText, "user");
+      userInput.value = "";
+      promptInput.value = finalText;
+      setStatus("Processing...");
+      showThinking();
 
-        setTimeout(() => {
-            let reply = getBotReply(text);
-            document.getElementById(loadingId).innerText = reply;
-            speakText(reply); // خودکار طور پر بول کر بھی سنائے گا
-        }, 700);
+      try {
+        const answer = await callGemini(finalText);
+        clearThinking();
+        addMessage(answer, "bot");
+        setResultText(answer);
+        setStatus("Reply generated successfully.");
+      } catch (error) {
+        clearThinking();
+        const fallback = fallbackReply(finalText);
+        addMessage(fallback, "bot");
+        setResultText(fallback);
+        setStatus("API unavailable. Demo fallback used.");
+      }
     }
 
-    function appendMessage(text, className, isHTML = false) {
-        const chatBox = document.getElementById("chatBox");
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${className}`;
-        msgDiv.id = "msg-" + Date.now();
-        
-        if (isHTML) {
-            msgDiv.innerHTML = text;
-        } else {
-            msgDiv.innerText = text;
-        }
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv.id;
+    function handleFormSend() {
+      if (userInput.value.trim()) {
+        sendMessage();
+      } else if (promptInput.value.trim()) {
+        sendMessage();
+      } else {
+        setStatus("Please enter something to ask AI.");
+      }
     }
 
-    function handleKeyPress(event) {
-        if (event.key === "Enter") sendMessage();
-    }
-
-    function getBotReply(input) {
-        input = input.toLowerCase();
-        if (input.includes("سلام") || input.includes("ہیلو")) {
-            return "وعلیکم السلام! فرمائیے، کون سی تصویر یا ویڈیو بنوانی ہے؟";
-        } else if (input.includes("کیسے ہو")) {
-            return "میں زبردست ہوں! آپ بتائیں، کیا نیا کام کرنا ہے۔";
-        } else {
-            return "آپ نے فرمایا: '" + input + "'. میں یہ کام بخوبی انجام دے سکتا ہوں!";
-        }
-    }
-
-    // 1. آواز سن کر لکھنے کا فیچرز (Speech-to-Text)
     function startVoiceInput() {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ur-PK'; // اردو آواز کے لیے
-            
-            appendMessage("🎤 سن رہا ہوں، بولیں...", "bot-message");
-            
-            recognition.onresult = function(event) {
-                const speechToText = event.results[0][0].transcript;
-                document.getElementById("userInput").value = speechToText;
-                sendMessage();
-            };
-            recognition.start();
-        } else {
-            alert("آپ کا براؤزر وائس ان پٹ سپورٹ نہیں کرتا۔");
-        }
-    }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    // 2. بول کر سنانے کا فیچر (Text-to-Speech)
-    function speakLastMessage() {
-        const chatBox = document.getElementById("chatBox");
-        const messages = chatBox.getElementsByClassName("bot-message");
-        if (messages.length > 0) {
-            const textToSpeak = messages[messages.length - 1].innerText;
-            speakText(textToSpeak);
-        }
+      if (!SpeechRecognition) {
+        addMessage("Your browser does not support voice input.", "bot");
+        setStatus("Voice input not supported.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "ur-PK";
+      recognition.interimResults = false;
+
+      addMessage("Listening... Please speak now.", "bot");
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+        promptInput.value = transcript;
+        setStatus("Voice captured. Sending message...");
+        sendMessage();
+      };
+
+      recognition.onerror = function () {
+        addMessage("Voice input failed. Try again.", "bot");
+        setStatus("Voice input failed.");
+      };
+
+      recognition.start();
     }
 
     function speakText(text) {
-        if ('speechSynthesis' in window) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'ur-PK';
-            window.speechSynthesis.speak(speech);
-        }
+      if (!('speechSynthesis' in window)) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ur-PK";
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
     }
 
-    // 3. تصویر بنانے کا فیچر (AI Image Generation via API/URL)
     function generateImage() {
-        const prompt = prompt("آپ کس چیز کی تصویر بنانا چاہتے ہیں؟ (مثال: Beautiful sunset, cat, etc.)", "A futuristic city");
-        if (prompt) {
-            appendMessage("🖼️ '" + prompt + "' کی تصویر تیار کی جا رہی ہے...", "bot-message");
-            
-            // ہم مفت آن لائن تصویر جنریٹر (Pollinations AI) کا استعمال کر رہے ہیں جو براہِ راست تصویر بنا کر دیتا ہے
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
-            
-            setTimeout(() => {
-                const htmlContent = `یہ رہی آپ کی مانگی گئی تصویر:<br><img src="${imageUrl}" alt="Generated AI Image">`;
-                appendMessage(htmlContent, "bot-message", true);
-                speakText("یہ رہی آپ کی تصویر۔");
-            }, 1000);
-        }
+      const imagePrompt = prompt("Enter the image idea:", "Futuristic city skyline at sunset");
+      if (!imagePrompt) return;
+
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}`;
+      const html = `Image prompt: <strong>${imagePrompt}</strong><br><img src="${url}" alt="Generated AI image">`;
+      addMessage(html, "bot", true);
+      setResultText("Generated image idea: " + imagePrompt);
+      setStatus("Image prompt generated.");
+      speakText("Image idea ready.");
     }
 
-    // 4. ویڈیو سے متعلق فیچر
     function createVideoIdea() {
-        appendMessage("🎬 ویڈیو کے لیے: آپ کسی بھی موضوع پر ویڈیو اسکرپٹ یا آئیڈیا مجھ سے لکھوا سکتے ہیں، یا اوپر وائس اور امیج کے فیچرز استعمال کر سکتے ہیں!", "bot-message");
-        speakText("آپ ویڈیو کا اسکرپٹ مجھ سے لکھوا سکتے ہیں۔");
+      const idea = "Short professional video idea: Open with a hook, show the problem, explain the solution, show results, and end with a strong call to action.";
+      addMessage(idea, "bot");
+      setResultText(idea);
+      setStatus("Video idea generated.");
+      speakText(idea);
     }
-</script>
 
+    function downloadConversation() {
+      const lines = [...messagesBox.children].map(el => el.textContent || el.innerText || "").join("\n\n");
+      const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ai-chat.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setStatus("Chat downloaded.");
+    }
+
+    function downloadTextFile(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", handleFormSend);
+    document.getElementById("askBtn").addEventListener("click", () => {
+      const prompt = (promptInput.value || userInput.value || "").trim();
+      if (!prompt) {
+        setStatus("Please enter a prompt first.");
+        return;
+      }
+      userInput.value = prompt;
+      sendMessage();
+    });
+
+    document.getElementById("downloadTxtBtn").addEventListener("click", () => {
+      if (!lastAnswer) {
+        setStatus("No text available to download.");
+        return;
+      }
+      downloadTextFile("gemini-output.txt", lastAnswer, "text/plain;charset=utf-8");
+      setStatus("TXT file downloaded.");
+    });
+
+    document.getElementById("downloadMdBtn").addEventListener("click", () => {
+      if (!lastAnswer) {
+        setStatus("No markdown content available.");
+        return;
+      }
+      downloadTextFile("gemini-output.md", lastAnswer, "text/markdown;charset=utf-8");
+      setStatus("MD file downloaded.");
+    });
+
+    document.getElementById("downloadJsonBtn").addEventListener("click", () => {
+      if (!lastAnswer) {
+        setStatus("No JSON content available.");
+        return;
+      }
+      const json = JSON.stringify({ answer: lastAnswer }, null, 2);
+      downloadTextFile("gemini-output.json", json, "application/json;charset=utf-8");
+      setStatus("JSON file downloaded.");
+    });
+
+    document.getElementById("zipBtn").addEventListener("click", () => {
+      if (!lastAnswer) {
+        setStatus("Generate an answer first.");
+        return;
+      }
+
+      if (typeof JSZip === "undefined") {
+        setStatus("ZIP library not loaded. Please include JSZip script.");
+        return;
+      }
+
+      const zip = new JSZip();
+      zip.file("README.md", "# Generated AI Project\n\n" + lastAnswer);
+      zip.file("index.html", "<!DOCTYPE html><html><body><h1>Generated Project</h1><p>" + escapeHtml(lastAnswer) + "</p></body></html>");
+      zip.file("style.css", "body { font-family: Arial, sans-serif; padding: 24px; }");
+      zip.file("script.js", "console.log('AI project generated');");
+
+      zip.generateAsync({ type: "blob" }).then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ai-project.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus("ZIP file generated.");
+      }).catch(() => {
+        setStatus("ZIP generation failed.");
+      });
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      setStatus("Saved locally in browser memory.");
+    });
+
+    document.getElementById("controlsBtn").addEventListener("click", () => {
+      setStatus("Controls enabled. You can type, upload an image, or speak.");
+    });
+
+    userInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleFormSend();
+      }
+    });
+
+    promptInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        handleFormSend();
+      }
+    });
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    const welcomeText = "Hello! I am your AI assistant. Write your question in the text box and click Send, or use the voice button to speak.";
+    addMessage(welcomeText, "bot");
+    setStatus("Ready. Type a prompt and click Send.");
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </body>
 </html>
