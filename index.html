@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملٹی میڈیا سپرمین چیٹ بوٹ (AI + Voice + Pic + Video)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            direction: rtl;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 95vh;
+            background: #1e293b;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        .chat-header {
+            background: #8b5cf6;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .chat-header span {
+            font-size: 12px;
+            font-weight: normal;
+            color: #ede9fe;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background: #6366f1;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .bot-message {
+            background: #334155;
+            color: #f1f5f9;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            border: 1px solid #475569;
+        }
+
+        .bot-message img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .extra-tools {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            background: #1e293b;
+            border-top: 1px solid #334155;
+            font-size: 12px;
+        }
+
+        .tool-btn {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tool-btn:hover { background: #64748b; }
+
+        .chat-input-area {
+            display: flex;
+            padding: 12px;
+            background: #0f172a;
+            border-top: 1px solid #334155;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: white;
+            border-radius: 8px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #8b5cf6;
+        }
+
+        button.send-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        button.send-btn:hover { background-color: #059669; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        ملٹی میڈیا سپرمین بوট
+        <span>آواز، تصویر، ویڈیو اور تمام عام و خاص کام!</span>
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-message">سلام! میں تیار ہوں۔ آپ مجھ سے لکھ کر بات کریں، نیچے دیے گئے بٹنوں سے **تصویر** بنوائیں، **آواز** سنیں یا **بول کر** حکم دیں۔</div>
+    </div>
+
+    <!-- ملٹی میڈیا ٹولز -->
+    <div class="extra-tools">
+        <button class="tool-btn" onclick="startVoiceInput()">🎤 بول کر لکھیں</button>
+        <button class="tool-btn" onclick="speakLastMessage()">🔊 آواز سنیں</button>
+        <button class="tool-btn" onclick="generateImage()">🖼️ تصویر بنائیں</button>
+        <button class="tool-btn" onclick="createVideoIdea()">🎬 ویڈیو بنا/سجھاؤ</button>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="یہاں کچھ لکھیں..." onkeypress="handleKeyPress(event)">
+        <button class="send-btn" onclick="sendMessage()">بھیجیں</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const input = document.getElementById("userInput");
+        const text = input.value.trim();
+        if (text === "") return;
+
+        appendMessage(text, "user-message");
+        input.value = "";
+
+        const loadingId = appendMessage("سوچ رہا ہوں...", "bot-message");
+
+        setTimeout(() => {
+            let reply = getBotReply(text);
+            document.getElementById(loadingId).innerText = reply;
+            speakText(reply); // خودکار طور پر بول کر بھی سنائے گا
+        }, 700);
+    }
+
+    function appendMessage(text, className, isHTML = false) {
+        const chatBox = document.getElementById("chatBox");
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${className}`;
+        msgDiv.id = "msg-" + Date.now();
+        
+        if (isHTML) {
+            msgDiv.innerHTML = text;
+        } else {
+            msgDiv.innerText = text;
+        }
+
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return msgDiv.id;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === "Enter") sendMessage();
+    }
+
+    function getBotReply(input) {
+        input = input.toLowerCase();
+        if (input.includes("سلام") || input.includes("ہیلو")) {
+            return "وعلیکم السلام! فرمائیے، کون سی تصویر یا ویڈیو بنوانی ہے؟";
+        } else if (input.includes("کیسے ہو")) {
+            return "میں زبردست ہوں! آپ بتائیں، کیا نیا کام کرنا ہے۔";
+        } else {
+            return "آپ نے فرمایا: '" + input + "'. میں یہ کام بخوبی انجام دے سکتا ہوں!";
+        }
+    }
+
+    // 1. آواز سن کر لکھنے کا فیچرز (Speech-to-Text)
+    function startVoiceInput() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ur-PK'; // اردو آواز کے لیے
+            
+            appendMessage("🎤 سن رہا ہوں، بولیں...", "bot-message");
+            
+            recognition.onresult = function(event) {
+                const speechToText = event.results[0][0].transcript;
+                document.getElementById("userInput").value = speechToText;
+                sendMessage();
+            };
+            recognition.start();
+        } else {
+            alert("آپ کا براؤزر وائس ان پٹ سپورٹ نہیں کرتا۔");
+        }
+    }
+
+    // 2. بول کر سنانے کا فیچر (Text-to-Speech)
+    function speakLastMessage() {
+        const chatBox = document.getElementById("chatBox");
+        const messages = chatBox.getElementsByClassName("bot-message");
+        if (messages.length > 0) {
+            const textToSpeak = messages[messages.length - 1].innerText;
+            speakText(textToSpeak);
+        }
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'ur-PK';
+            window.speechSynthesis.speak(speech);
+        }
+    }
+
+    // 3. تصویر بنانے کا فیچر (AI Image Generation via API/URL)
+    function generateImage() {
+        const prompt = prompt("آپ کس چیز کی تصویر بنانا چاہتے ہیں؟ (مثال: Beautiful sunset, cat, etc.)", "A futuristic city");
+        if (prompt) {
+            appendMessage("🖼️ '" + prompt + "' کی تصویر تیار کی جا رہی ہے...", "bot-message");
+            
+            // ہم مفت آن لائن تصویر جنریٹر (Pollinations AI) کا استعمال کر رہے ہیں جو براہِ راست تصویر بنا کر دیتا ہے
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+            
+            setTimeout(() => {
+                const htmlContent = `یہ رہی آپ کی مانگی گئی تصویر:<br><img src="${imageUrl}" alt="Generated AI Image">`;
+                appendMessage(htmlContent, "bot-message", true);
+                speakText("یہ رہی آپ کی تصویر۔");
+            }, 1000);
+        }
+    }
+
+    // 4. ویڈیو سے متعلق فیچر
+    function createVideoIdea() {
+        appendMessage("🎬 ویڈیو کے لیے: آپ کسی بھی موضوع پر ویڈیو اسکرپٹ یا آئیڈیا مجھ سے لکھوا سکتے ہیں، یا اوپر وائس اور امیج کے فیچرز استعمال کر سکتے ہیں!", "bot-message");
+        speakText("آپ ویڈیو کا اسکرپٹ مجھ سے لکھوا سکتے ہیں۔");
+    }
+</script>
+
+</body>
+</html>
